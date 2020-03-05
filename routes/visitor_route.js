@@ -4,7 +4,7 @@ const visitor = require("../models").visitor;
 module.exports = function(router) {
   router.get("/visitor", (req, res) => {
     visitor.findAll({
-    //   include: [employee]
+      // include: [employee]
     //   on: {
     //     col1: sequelize.where(sequelize.col("visitor.employee_yang_dituju"), "=", sequelize.col("employee.nama_employee"))
     // },

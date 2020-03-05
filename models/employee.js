@@ -15,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
     //     name: 'employee_yang_dituju'
     //   }
     // });
+    employee.hasOne(models.visitor,  {
+      foreignKey: {
+        name: 'employee_yang_dituju'
+      }
+    })
   };
   return employee;
 };
