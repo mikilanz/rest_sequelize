@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
   const employee = sequelize.define('employee', {
     nama_employee: DataTypes.STRING,
     nip: DataTypes.INTEGER,
-    tanggal_join: DataTypes.DATE
+    tanggal_join: DataTypes.DATEONLY
   }, {
     // freezeTableName: true
   });

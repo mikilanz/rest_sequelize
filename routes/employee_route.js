@@ -1,7 +1,9 @@
 const employee = require("../models").employee;
 const visitor = require("../models").visitor;
+const { Op } = require("sequelize");
 
 module.exports = function(router) {
+  
   router.get("/employee", async function (req, res) {
     try {
       const employees = await employee.findAll({});
@@ -14,7 +16,7 @@ module.exports = function(router) {
       } else {
         res.json({
           'status': '400',
-          'messages': 'EMPTY',
+          'messages': 'Data is Empty',
           'data': {}
         })
       }
@@ -64,9 +66,6 @@ module.exports = function(router) {
       } = req.body;
 
       const employees = await employee.create({
-        // nama_employee: req.body.nama_employee,
-        // nip: req.body.nip,
-        // tanggal_join: req.body.tanggal_join
         nama_employee,
         nip,
         tanggal_join
@@ -87,7 +86,7 @@ module.exports = function(router) {
    }
   });
 
-  router.put('/employee/:id', async function (req, res, next) {
+  router.patch('/employee/:id', async function (req, res, next) {
     try {
       const {
         nama_employee,
@@ -103,14 +102,14 @@ module.exports = function(router) {
     if (employees != 0) {
       res.status(201).json({
         'status': 'OK',
-        'messages': 'Data Employee berhasil diupdate',
-        'data': employees,
+        'messages': 'Data Employee id ='+req.params.id+' berhasil diupdate',
+        'data': 'Affected rows: '+employees,
       })
     } else{
       res.status(404).json({
         'status': '404',
         'messages': 'ID not found',
-        'data': employees,
+        'data': 'Affected rows: '+employees,
       })
     }
    } catch (err) {
@@ -121,7 +120,7 @@ module.exports = function(router) {
      })
    }
   });
-  router.put('/employee', async function (req, res, next) {
+  router.patch('/employee', async function (req, res, next) {
     
      res.status(405).json({
        'status': '405 ',
@@ -132,21 +131,79 @@ module.exports = function(router) {
   });
 
 
-  // router.put("/employee/:id", (req, res) => {
-  //   employee.update({ name: req.body.name }, { where: { id: req.params.id } })
-  //     .then(updatedPhysician => {
-  //       res.json(updatedPhysician);
-  //     })
-  //     .catch(err => res.json(err));
-  // });
+  router.delete('/employee/:id', async function (req, res, next) {
+    try {
+      
+      const employees = await employee.destroy({ where: {
+        id: req.params.id
+      }})
+      if (employees != 0) {
+        res.json({
+          'status': '200',
+          'messages': 'Data Employee id = '+req.params.id+' berhasil dihapus',
+          'data': 'Affected rows: '+employees,
+        })
+      } else{
+        res.json({
+          'status': '404',
+          'messages': 'Data Employee id = '+req.params.id+' tidak ditemukan',
+          'data': 'Affected rows: '+employees,
+        })
+      }
+    } catch (err) {
+      res.status(400).json({
+        'status': 'ERROR',
+        'messages': err.message,
+        'data': {},
+      })
+    }
+  });
 
-  // router.delete("/employee/:id", (req, res) => {
-  //   employee.destroy({
-  //     where: { id: req.params.id }
-  //   })
-  //     .then(physician => {
-  //       res.json(physician);
-  //     })
-  //     .catch(err => res.json(err));
-  // });
+  router.get("/summary_visit", async function (req, res) {
+    try {
+      var mix = [];
+      const employees = await employee.findAll({});
+
+      for(var i = 0 ; i < employees.length ; i++){
+        let obj = new Object;
+        const visitor_count = await visitor.count({
+
+          where: {
+            employee_yang_dituju: employees[i]['nama_employee'],
+            tanggal_visit: {
+              [Op.between]: [req.query.date1, req.query.date2]
+            }
+          }
+        });
+
+        obj.employee_name = employees[i]['nama_employee'];
+        obj.nip           = employees[i]['nip'];
+        obj.join_date     = employees[i]['tanggal_join'];
+        obj.visitor_count = visitor_count;
+
+        mix.push(obj);
+      }
+
+
+      if (mix.length !== 0) {
+        res.json({
+          'status': '200',
+          'messages': 'Success',
+          'data': mix
+        })
+      } else {
+        res.json({
+          'status': '400',
+          'messages': 'EMPTY',
+          'data': {}
+        })
+      }
+    } catch (err) {
+      res.json({
+        'status': '400',
+        'messages': err.messages,
+        'data': {}
+      })
+    }
+  });
 };

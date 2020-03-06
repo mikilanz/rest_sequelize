@@ -15,7 +15,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       tanggal_visit: {
-        type: Sequelize.DATE
+        type: Sequelize.DATEONLY
       },
       createdAt: {
         allowNull: false,

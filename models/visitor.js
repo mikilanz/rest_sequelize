@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
   const visitor = sequelize.define('visitor', {
     nama_visitor: DataTypes.STRING,
     employee_yang_dituju: DataTypes.STRING,
-    tanggal_visit: DataTypes.DATE
+    tanggal_visit: DataTypes.DATEONLY
   }, {
     // freezeTableName: true
   });

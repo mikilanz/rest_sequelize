@@ -2,54 +2,34 @@ const employee = require("../models").employee;
 const visitor = require("../models").visitor;
 
 module.exports = function(router) {
-  router.get("/visitor", (req, res) => {
-    visitor.findAll({
-      // include: [employee]
-    //   on: {
-    //     col1: sequelize.where(sequelize.col("visitor.employee_yang_dituju"), "=", sequelize.col("employee.nama_employee"))
-    // },
-    })
-      .then(vis => {
-        res.json(vis);
+
+  router.post('/visitor', async function (req, res, next) {
+    try {
+      const {
+        nama_visitor,
+        employee_yang_dituju,
+        tanggal_visit
+      } = req.body;
+
+      const visitors = await visitor.create({
+        nama_visitor,
+        employee_yang_dituju,
+        tanggal_visit
+      });
+    if (visitors) {
+      res.status(201).json({
+        'status': 'OK',
+        'messages': 'Data visitor berhasil ditambahkan',
+        'data': visitors,
       })
-      .catch(err => res.json(err));
+    }
+   } catch (err) {
+     res.status(400).json({
+       'status': 'ERROR',
+       'messages': err.message,
+       'data': {},
+     })
+   }
   });
 
-//   router.get("/employee/:id", (req, res) => {
-//     employee.findAll({
-//       where: { id: req.params.id }
-//     })
-//       .then(physician => {
-//         res.json(physician[0]);
-//       })
-//       .catch(err => res.json(err));
-//   });
-
-//   router.post("/employee", (req, res) => {
-//     employee.create({
-//       name: req.body.name
-//     })
-//       .then(res => {
-//         res.json(res);
-//       })
-//       .catch(err => res.json(err));
-//   });
-
-//   router.put("/employee/:id", (req, res) => {
-//     employee.update({ name: req.body.name }, { where: { id: req.params.id } })
-//       .then(updatedPhysician => {
-//         res.json(updatedPhysician);
-//       })
-//       .catch(err => res.json(err));
-//   });
-
-//   router.delete("/employee/:id", (req, res) => {
-//     employee.destroy({
-//       where: { id: req.params.id }
-//     })
-//       .then(physician => {
-//         res.json(physician);
-//       })
-//       .catch(err => res.json(err));
-//   });
 };
